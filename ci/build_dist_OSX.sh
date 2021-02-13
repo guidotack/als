@@ -21,8 +21,6 @@ pip install --upgrade astroid==2.2.0
 
 python setup.py develop
 
-./ci/pylint.sh
-
 tags=$(git tag --contains HEAD)
 
 if [ -z "${tags}" ]

@@ -1,0 +1,70 @@
+default:
+  interruptible: true
+
+stages:
+  - validation
+  - build
+
+pylint:
+  stage: validation
+  tags:
+    - ServerRunner
+  before_script:
+    - python3 -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install wheel
+    - pip install setuptools
+    - pip install $(grep numpy requirements.txt)
+    - pip install -r requirements.txt
+    - pip install --upgrade astroid==2.2.0
+  script:
+    - python setup.py develop && ./ci/pylint.sh
+
+linux distribution:
+  stage: build
+  tags:
+    - Tricia
+  script:
+    - ci/build_dist.sh
+  artifacts:
+    name: ALS Linux amd64
+    paths:
+      - dist/als-*.run
+
+
+RPI distribution:
+  stage: build
+  tags:
+    - ARM64
+  script:
+    - ci/build_dist_rpi4.sh
+  artifacts:
+    name: ALS Linux arm64
+    paths:
+      - dist/als-*.tgz
+
+OSX distribution:
+  variables:
+    LC_CTYPE: UTF-8
+  stage: build
+  tags:
+    - OSX
+  script:
+    - ci/build_dist_OSX.sh
+  artifacts:
+    name: ALS OSX
+    paths:
+      - dist/ALS-*.dmg
+
+Windows distribution:
+  stage: build
+  tags:
+    - Windows
+  script:
+    - set PATH="C:\Program Files\Git\bin;C:\opt\jdk8\bin;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\opt\python-3.7.7\Scripts;C:\opt\python-3.7.7;"
+    - bash.exe ci\\build_dist_windows.sh
+  artifacts:
+    name: ALS Windows
+    paths:
+      - dist\als.exe
