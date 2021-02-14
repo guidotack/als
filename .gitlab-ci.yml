@@ -21,7 +21,7 @@ pylint:
   script:
     - python setup.py develop && ./ci/pylint.sh
 
-linux amd64 distribution:
+Linux amd64 distribution:
   stage: build
   tags:
     - Tricia
