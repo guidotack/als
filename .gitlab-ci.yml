@@ -45,8 +45,6 @@ Linux arm64 distribution:
       - dist/als-*.tgz
 
 OSX distribution:
-  variables:
-    LC_CTYPE: UTF-8
   stage: build
   tags:
     - OSX
