@@ -21,7 +21,7 @@ pylint:
   script:
     - python setup.py develop && ./ci/pylint.sh
 
-linux distribution:
+linux amd64 distribution:
   stage: build
   tags:
     - Tricia
@@ -33,7 +33,7 @@ linux distribution:
       - dist/als-*.run
 
 
-RPI distribution:
+Linux arm64 distribution:
   stage: build
   tags:
     - ARM64
