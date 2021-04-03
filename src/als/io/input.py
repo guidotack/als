@@ -21,12 +21,16 @@ from als.messaging import MESSAGE_HUB
 from als.model.base import Image
 from als.model.data import DYNAMIC_DATA
 
+import PyIndi
+import io
+
 _LOGGER = logging.getLogger(__name__)
 
 _IGNORED_FILENAME_START_PATTERNS = ['.', '~', 'tmp']
 _DEFAULT_SCAN_FILE_SIZE_RETRY_PERIOD_IN_SEC = 0.5
 
 SCANNER_TYPE_FILESYSTEM = "FS"
+SCANNER_TYPE_INDI = "INDI"
 
 
 class InputError(Exception):
@@ -83,7 +87,7 @@ class InputScanner:
 
     @staticmethod
     @log
-    def create_scanner(scanner_type: str = SCANNER_TYPE_FILESYSTEM):
+    def create_scanner(scanner_type: str = SCANNER_TYPE_INDI):
         """
         Factory for image scanners.
 
@@ -96,12 +100,72 @@ class InputScanner:
         :return: the right scanner implementation
         :rtype: InputScanner subclass
         """
-
+        print("create scanner", scanner_type)
         if scanner_type == SCANNER_TYPE_FILESYSTEM:
             return FolderScanner()
+        elif scanner_type == SCANNER_TYPE_INDI:
+            return IndiScanner()
 
         raise ValueError(f"Unsupported scanner type : {scanner_type}")
 
+class IndiScanner(InputScanner, QObject, PyIndi.BaseClient):
+    def __init__(self):
+        PyIndi.BaseClient.__init__(self)
+        InputScanner.__init__(self)
+        QObject.__init__(self)
+        self.ccdDevice = None
+        self.setServer(config.get_indi_server(),config.get_indi_port())
+    
+    def start(self):
+        if not self.isServerConnected():
+            self.connectServer()
+    
+    def stop(self):
+        if self.isServerConnected():
+            self.disconnectServer()
+
+    def newDevice(self, d):
+        if d.getDeviceName() == config.get_indi_device():
+            self.ccdDevice = d
+            self.setBLOBMode(PyIndi.B_ALSO, d.getDeviceName(), "CCD1")
+        pass
+    def removeDevice(self, d):
+        if d == self.ccdDevice:
+            self.ccdDevice = None
+        pass
+    def newProperty(self, p):
+        pass
+    def removeProperty(self, p):
+        pass
+    def newBLOB(self, bp):
+        if self.ccdDevice:            
+            ccd1 = self.ccdDevice.getBLOB("CCD1")
+            if ccd1:
+                for blob in ccd1:
+                    fitsData = blob.getblobdata()
+                    blobFile = io.BytesIO(fitsData)
+                    hdul = fits.open(blobFile)
+                    image = Image(hdul[0].data)
+
+                    if 'BAYERPAT' in hdul[0].header:
+                        image.bayer_pattern = hdul[0].header['BAYERPAT']
+                    self.broadcast_image(image)
+    def newSwitch(self, svp):
+        pass
+    def newNumber(self, nvp):
+        pass
+    def newText(self, tvp):
+        pass
+    def newLight(self, lvp):
+        pass
+    def newMessage(self, d, m):
+        pass
+    def serverConnected(self):
+        # print("Server connected")
+        pass
+    def serverDisconnected(self, code):
+        # print("Server disconnected")
+        pass
 
 class FolderScanner(FileSystemEventHandler, InputScanner, QObject):
     """

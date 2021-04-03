@@ -30,6 +30,10 @@ _CONFIG_FILE_PATH = os.path.expanduser("~/.als.cfg")
 # keys used to retrieve config values
 _SCAN_FOLDER_PATH = "scan_folder_path"
 _WORK_FOLDER_PATH = "work_folder_path"
+_INPUT_SYSTEM = "input_system"
+_INDI_SERVER = "indi_server"
+_INDI_PORT = "indi_port"
+_INDI_DEVICE = "indi_device"
 _WWW_FOLDER_PATH = "web_folder_path"
 _WWW_DEDICATED_FOLDER = "www_dedicated_folder"
 _LOG_LEVEL = "log_level"
@@ -67,6 +71,10 @@ _LOG_LEVELS = {
 _DEFAULTS = {
     _SCAN_FOLDER_PATH:      os.path.expanduser("~/als/scan"),
     _WORK_FOLDER_PATH:      os.path.expanduser("~/als/work"),
+    _INPUT_SYSTEM:          "FS",
+    _INDI_SERVER:           "localhost",
+    _INDI_PORT:             "7624",
+    _INDI_DEVICE:           "",
     _WWW_FOLDER_PATH:       os.path.expanduser("~/als/work"),
     _WWW_DEDICATED_FOLDER:  0,
     _LOG_LEVEL:             _LOG_LEVEL_INFO,
@@ -339,6 +347,89 @@ def set_work_folder_path(path):
     """
     _set(_WORK_FOLDER_PATH, path)
 
+def get_input_system():
+    """
+    Retrieves the input system.
+
+    :return: the input system
+    :rtype: str
+    """
+    try:
+        return _get(_INPUT_SYSTEM)
+    except ValueError:
+        return _DEFAULTS[_INPUT_SYSTEM]
+
+def set_input_system(s):
+    """
+    Sets the input system.
+
+    :param s: the input system
+    :type s: str
+    """
+    return _set(_INPUT_SYSTEM, s)
+
+def get_indi_server():
+    """
+    Retrieves the INDI server address.
+
+    :return: the INDI server
+    :rtype: str
+    """
+    try:
+        return _get(_INDI_SERVER)
+    except ValueError:
+        return _DEFAULTS[_INDI_SERVER]
+
+def set_indi_server(s):
+    """
+    Sets the INDI server address.
+
+    :param s: the indi server address
+    :type s: str
+    """
+    return _set(_INDI_SERVER, s)
+
+def get_indi_port():
+    """
+    Retrieves the INDI port number.
+
+    :return: the INDI port number
+    :rtype: int
+    """
+    try:
+        return int(_get(_INDI_PORT))
+    except ValueError:
+        return int(_DEFAULTS[_INDI_PORT])
+
+def set_indi_port(p):
+    """
+    Sets the INDI port number
+
+    :param p: the INDI port number
+    :type s: int
+    """
+    return _set(_INDI_PORT, p)
+
+def get_indi_device():
+    """
+    Retrieves the INDI CCD device name
+
+    :return: the INDI CCD device name
+    :rtype: str
+    """
+    try:
+        return _get(_INDI_DEVICE)
+    except ValueError:
+        return _DEFAULTS[_INDI_DEVICE]
+
+def set_indi_device(d):
+    """
+    Sets the INDI CCD device name.
+
+    :param s: the indi CCD device name
+    :type s: str
+    """
+    return _set(_INDI_DEVICE, d)
 
 def get_bayer_pattern():
     """

@@ -293,8 +293,7 @@ class Stacker(QueueConsumer):
             target_index = 0
             source_data = image.data
             reference_data = reference.data
-
-        results_dict[target_index] = np.float32(al.apply_transform(transformation, source_data, reference_data))
+        results_dict[target_index] = np.float32(al.apply_transform(transformation, source_data, reference_data)[0])
 
     @log
     def _find_transformation(self, image: Image):
@@ -325,7 +324,6 @@ class Stacker(QueueConsumer):
             try:
                 _LOGGER.debug(f"Searching valid transformation on subset "
                               f"with ratio:{ratio} and shape: {new_subset.shape}")
-
                 transformation, matches = al.find_transform(new_subset, ref_subset)
 
                 _LOGGER.debug(f"Found transformation with subset ratio = {ratio}")

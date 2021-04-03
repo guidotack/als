@@ -82,8 +82,8 @@ class Controller:
         DYNAMIC_DATA.post_processor_busy = False
         DYNAMIC_DATA.saver_busy = False
 
-        self._input_scanner: InputScanner = InputScanner.create_scanner()
-
+        self._input_scanner : InputScanner = None
+        
         self._pre_process_queue: SignalingQueue = DYNAMIC_DATA.pre_process_queue
         self._pre_process_pipeline: Pipeline = Pipeline(
             'pre-process',
@@ -116,7 +116,6 @@ class Controller:
 
         self._model_observers = list()
 
-        self._input_scanner.new_image_signal[Image].connect(self.on_new_image_read)
         self._pre_process_pipeline.new_result_signal[Image].connect(self.on_new_pre_processed_image)
         self._stacker.stack_size_changed_signal[int].connect(self.on_stack_size_changed)
         self._stacker.new_result_signal[Image].connect(self.on_new_stack_result)
@@ -439,6 +438,9 @@ class Controller:
             if DYNAMIC_DATA.session.is_stopped:
 
                 MESSAGE_HUB.dispatch_info(__name__, QT_TRANSLATE_NOOP("", "Starting new session..."))
+
+                self._input_scanner: InputScanner = InputScanner.create_scanner(config.get_input_system())
+                self._input_scanner.new_image_signal[Image].connect(self.on_new_image_read)
 
                 DYNAMIC_DATA.has_new_warnings = False
                 self._stacker.reset()

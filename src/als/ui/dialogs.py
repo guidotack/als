@@ -70,8 +70,33 @@ class PreferencesDialog(QDialog):
                                      self._ui.ln_web_folder_path,
                                      self._ui.btn_browse_web]
 
+        self._file_input_controls = [self._ui.lbl_scan_folder,
+                                     self._ui.ln_scan_folder_path,
+                                     self._ui.btn_browse_scan,
+                                     self._ui.lbl_work_folder,
+                                     self._ui.ln_work_folder_path,
+                                     self._ui.btn_browse_work]
+        self._indi_input_controls = [self._ui.lbl_indi_server,
+                                     self._ui.ln_indi_server,
+                                     self._ui.lbl_indi_port,
+                                     self._ui.ln_indi_port,
+                                     self._ui.lbl_indi_device,
+                                     self._ui.ln_indi_device]
+
         for control in self._web_folder_controls:
             control.setVisible(self._ui.chk_www_own_folder.isChecked())
+
+        self._ui.radioInputFileSystem.setChecked(config.get_input_system() == "FS")
+        self._ui.radioInputIndi.setChecked(config.get_input_system() == "INDI")
+        self._ui.ln_indi_server.setText(config.get_indi_server())
+        self._ui.ln_indi_port.setText(str(config.get_indi_port()))
+        self._ui.ln_indi_device.setText(config.get_indi_device())
+
+        for control in self._file_input_controls:
+            control.setEnabled(self._ui.radioInputFileSystem.isChecked())
+        
+        for control in self._indi_input_controls:
+            control.setEnabled(self._ui.radioInputIndi.isChecked())
 
         self._validate_all_paths()
 
@@ -111,6 +136,30 @@ class PreferencesDialog(QDialog):
 
     @log
     @pyqtSlot(bool)
+    def on_radioInputFileSystem_toggled(self, checked):
+        """
+        Enables/disables file system setting controls
+
+        :param checked: is 'File system' box checked ?
+        :type checked: bool
+        """
+        for control in self._file_input_controls:
+            control.setEnabled(checked)
+
+    @log
+    @pyqtSlot(bool)
+    def on_radioInputIndi_toggled(self, checked):
+        """
+        Enables/disables Indi setting controls
+
+        :param checked: is 'Indi' box checked ?
+        :type checked: bool
+        """
+        for control in self._indi_input_controls:
+            control.setEnabled(checked)
+
+    @log
+    @pyqtSlot(bool)
     def on_chk_www_own_folder_clicked(self, checked):
         """
         Hides web folder setting controls if server does not use dedicated folder
@@ -136,6 +185,25 @@ class PreferencesDialog(QDialog):
         """checks and stores user settings"""
         config.set_scan_folder_path(self._ui.ln_scan_folder_path.text())
         config.set_work_folder_path(self._ui.ln_work_folder_path.text())
+        config.set_indi_server(self._ui.ln_indi_server.text())
+        config.set_indi_device(self._ui.ln_indi_device.text())
+
+        indi_port_number_str = self._ui.ln_indi_port.text()
+        if indi_port_number_str.isdigit() and 1024 <= int(indi_port_number_str) <= 65535:
+            config.set_indi_port(indi_port_number_str)
+        else:
+            message = self.tr("Indi server port number must be a number between 1024 and 65535")
+            error_box(self.tr("Wrong value"), message)
+            MESSAGE_HUB.dispatch_error(__name__, QT_TRANSLATE_NOOP("", "Port number validation failed : {}"), [message,])
+            self._ui.radioInputIndi.setChecked(True)
+            self._ui.ln_indi_port.setFocus()
+            self._ui.ln_indi_port.selectAll()
+            return
+
+        if self._ui.radioInputFileSystem.isChecked():
+            config.set_input_system("FS")
+        else:
+            config.set_input_system("INDI")
 
         www_own_folder_is_checked = self._ui.chk_www_own_folder.isChecked()
         config.set_www_use_dedicated_folder(www_own_folder_is_checked)

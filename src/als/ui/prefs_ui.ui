@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>655</width>
-    <height>768</height>
+    <width>665</width>
+    <height>965</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,22 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Paths</string>
+      <string>Input</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QRadioButton" name="radioInputFileSystem">
+        <property name="text">
+         <string>File system</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">input_button_group</string>
+        </attribute>
+       </widget>
+      </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
@@ -85,6 +98,78 @@
            <string>Change...</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioInputIndi">
+        <property name="text">
+         <string>Indi</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">input_button_group</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="lbl_indi_server">
+          <property name="text">
+           <string>Server :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="ln_indi_server"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QLabel" name="lbl_indi_port">
+          <property name="text">
+           <string>Port :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="ln_indi_port">
+          <property name="text">
+           <string>7624</string>
+          </property>
+          <property name="maxLength">
+           <number>6</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <item>
+         <widget class="QLabel" name="lbl_indi_device">
+          <property name="text">
+           <string>Device :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="ln_indi_device"/>
         </item>
        </layout>
       </item>
@@ -292,6 +377,9 @@
           <property name="text">
            <string>&amp;TIFF</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">format_button_group</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -299,6 +387,9 @@
           <property name="text">
            <string>PN&amp;G</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">format_button_group</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -306,6 +397,9 @@
           <property name="text">
            <string>&amp;JPEG</string>
           </property>
+          <attribute name="buttonGroup">
+           <string notr="true">format_button_group</string>
+          </attribute>
          </widget>
         </item>
         <item>
@@ -665,4 +759,8 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="input_button_group"/>
+  <buttongroup name="format_button_group"/>
+ </buttongroups>
 </ui>
